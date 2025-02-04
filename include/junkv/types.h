@@ -10,5 +10,6 @@ typedef signed long long   int64_t;
 typedef unsigned long long uint64_t;
 
 typedef uint64_t           ptr_t;
+typedef uint64_t           reg_t;
 
 #endif /* __JUNKV_TYPES_H_ */

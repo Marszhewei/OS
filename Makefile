@@ -14,17 +14,20 @@ BUILD_PATH = build
 CFLAGS = -nostdlib -fno-builtin -march=rv64g -mabi=lp64 -g -Wall -I include -mcmodel=medany
 LDFLAGS = -T ${BUILD_PATH}/kernel.ld.generated
 
-SRCS_ASM = \
-	boot/boot.S \
-	mm/mem.S
-SRCS_C = \
+SRCS_ASM =          \
+	boot/boot.S     \
+	mm/mem.S        \
+	kernel/entry.S
+
+SRCS_C =            \
 	kernel/kernel.c \
-	mm/page.c \
-	lib/uart.c \
-	lib/printf.c
+	mm/page.c       \
+	kernel/uart.c   \
+	kernel/printf.c \
+	kernel/sched.c
 
 vpath %.c kernel lib mm
-vpath %.S boot mm
+vpath %.S boot mm kernel
 
 OBJS_ASM = $(addprefix ${BUILD_PATH}/, $(notdir $(patsubst %.S, %.o, ${SRCS_ASM})))
 OBJS_C   = $(addprefix ${BUILD_PATH}/, $(notdir $(patsubst %.c, %.o, ${SRCS_C})))
