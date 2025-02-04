@@ -8,6 +8,10 @@ void start_kernel(void)
 
 	printf("Hello, Junkv-OS!\n");
 
+	char name[32];
+	uart_gets(name);
+	printf("Your input is: %s\n", name);
+
 	page_init();
 
 	// go idle

@@ -105,10 +105,10 @@ void uart_init()
 	uart_write_reg(LCR, lcr | (3 << 0));
 }
 
-int uart_putc(char ch)
+void uart_putc(char ch)
 {
 	while ((uart_read_reg(LSR) & LSR_TX_IDLE) == 0);
-	return uart_write_reg(THR, ch);
+	uart_write_reg(THR, ch);
 }
 
 void uart_puts(char *s)
@@ -116,4 +116,33 @@ void uart_puts(char *s)
 	while (*s) {
 		uart_putc(*s++);
 	}
+}
+
+char uart_getc()
+{
+	while ((uart_read_reg(LSR) & LSR_RX_READY) == 0);
+	return uart_read_reg(RHR);
+}
+
+uint64_t uart_gets(char *s)
+{
+	char *t = s;
+	while (1) {
+		char ch = uart_getc();
+		if (ch == '\r') {
+			uart_putc('\r');
+			uart_putc('\n');
+			*t = '\0';
+			break;
+		} else if (ch == '\b' || ch == 0x7f) {
+			if (t > s) {
+				uart_puts("\b \b");
+				t--;
+			}
+		} else {
+			uart_putc(ch);
+			*t++ = ch;
+		}
+	}
+	return t - s;
 }
