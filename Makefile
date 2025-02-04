@@ -1,36 +1,75 @@
-QEMU = qemu-system-riscv32
-QFLAGS = -nographic -smp 1 -machine virt -bios none
+CROSS_COMPILE = riscv64-unknown-elf-
 
-CC = riscv32-unknown-elf-gcc
-CFLAGS = -nostdlib -fno-builtin -march=rv32ima -mabi=ilp32 -g -Wall
+QEMU = qemu-system-riscv64
+QFLAGS = -nographic -smp 1 -machine virt -bios none -gdb tcp::1234
 
-# just for qemu virt
-DRAM_START_ADDRESS = 0x80000000
+CC = ${CROSS_COMPILE}gcc
+# GDB = ${CROSS_COMPILE}gdb
+GDB = gdb-multiarch
+OBJCOPY = ${CROSS_COMPILE}objcopy
+OBJDUMP = ${CROSS_COMPILE}objdump
 
-SRCS_ASM = boot.S
-SRCS_C = kernel.c
+BUILD_PATH = build
 
-OBJS = $(SRCS_ASM:.S=.o)
-OBJS += $(SRCS_C:.c=.o)
+CFLAGS = -nostdlib -fno-builtin -march=rv64g -mabi=lp64 -g -Wall -I include -mcmodel=medany
+LDFLAGS = -T ${BUILD_PATH}/kernel.ld.generated
 
-all: os.elf
+SRCS_ASM = \
+	boot/boot.S \
+	mm/mem.S
+SRCS_C = \
+	kernel/kernel.c \
+	mm/page.c \
+	lib/uart.c \
+	lib/printf.c
 
-os.elf: ${OBJS}
-	${CC} ${CFLAGS} -Ttext=${DRAM_START_ADDRESS} -o os.elf $^
+vpath %.c kernel lib mm
+vpath %.S boot mm
 
-%.o: %.c
+OBJS_ASM = $(addprefix ${BUILD_PATH}/, $(notdir $(patsubst %.S, %.o, ${SRCS_ASM})))
+OBJS_C   = $(addprefix ${BUILD_PATH}/, $(notdir $(patsubst %.c, %.o, ${SRCS_C})))
+OBJS = ${OBJS_ASM} ${OBJS_C}
+
+ELF = ${BUILD_PATH}/junkv.elf
+BIN = ${BUILD_PATH}/junkv.bin
+
+.DEFAULT_GOAL := all
+all: ${BUILD_PATH} ${ELF}
+
+${BUILD_PATH}:
+	@mkdir -p $@
+
+${ELF}: ${OBJS}
+	${CC} -E -P -x c ${DEFS} ${CFLAGS} kernel.ld > ${BUILD_PATH}/kernel.ld.generated
+	${CC} ${CFLAGS} ${LDFLAGS} -o ${ELF} $^
+	${OBJCOPY} -O binary ${ELF} ${BIN}
+
+${BUILD_PATH}/%.o: %.c
 	${CC} ${CFLAGS} -c -o $@ $<
 
-%.o: %.S
+${BUILD_PATH}/%.o: %.S
 	${CC} ${CFLAGS} -c -o $@ $<
 
+.PHONY : run
 run: all
 	@${QEMU} -M ? | grep virt >/dev/null || exit
 	@echo "Press Ctrl-A and then X to exit QEMU"
 	@echo "------------------------------------"
-	@${QEMU} ${QFLAGS} -kernel os.elf
+	@${QEMU} ${QFLAGS} -kernel ${ELF}
+
+.PHONY : debug
+debug: all
+	@echo "Press Ctrl-C and then input 'quit' to exit GDB and QEMU"
+	@echo "-------------------------------------------------------"
+	@${QEMU} ${QFLAGS} -kernel ${ELF} -S &
+	@${GDB} ${ELF} -q -x gdbinit
+	@killall qemu-system-riscv64 2> /dev/null || true
+
+.PHONY : code
+code: all
+	@${OBJDUMP} -S ${ELF} | less
 
 .PHONY : clean
 clean:
-	rm -rf *.o *.elf
+	rm -rf ${BUILD_PATH}
 
