@@ -1,0 +1,21 @@
+CompileFlags:
+  Add: 
+    - "-nostdlib"
+    - "-fno-builtin"
+    - "-march=rv64g"
+    - "-mabi=lp64"
+    - "-Wall"
+    - "-I/home/fetch150zy/Repo/junkv-os/include"
+    - "--target=riscv64"
+    - "-mcmodel=medany"
+    - "-isystem/usr/riscv64-unknown-elf/include"
+    - "--gcc-toolchain=/usr/riscv64-unknown-elf"
+
+  Remove: 
+    - "-W*"
+
+Index:
+  StandardLibrary: No
+
+Diagnostics:
+  UnusedIncludes: Strict
