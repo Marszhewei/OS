@@ -1,6 +1,6 @@
 #include "kernel.h"
-#include "junkv/sched.h"
 
+extern void user_main(void);
 
 void start_kernel(void)
 {
@@ -14,9 +14,10 @@ void start_kernel(void)
 	// printf("Your input is: %s\n", name);
 
 	page_init();
-
 	sched_init();
-	schedule();
+
+	user_main();
+
 	schedule();
 
 	uart_puts("Would not go here!\n");

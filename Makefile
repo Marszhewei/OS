@@ -24,9 +24,10 @@ SRCS_C =            \
 	mm/page.c       \
 	kernel/uart.c   \
 	kernel/printf.c \
-	kernel/sched.c
+	kernel/sched.c  \
+	user/main.c
 
-vpath %.c kernel lib mm
+vpath %.c kernel lib mm user
 vpath %.S boot mm kernel
 
 OBJS_ASM = $(addprefix ${BUILD_PATH}/, $(notdir $(patsubst %.S, %.o, ${SRCS_ASM})))
