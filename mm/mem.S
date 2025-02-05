@@ -1,4 +1,4 @@
-#define SIZE_PTR .word
+#define SIZE_PTR .dword
 
 .section .rodata
 .global HEAP_START
