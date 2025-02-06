@@ -25,6 +25,7 @@ SRCS_C =            \
 	kernel/uart.c   \
 	kernel/printf.c \
 	kernel/sched.c  \
+	kernel/trap.c   \
 	user/main.c
 
 vpath %.c kernel lib mm user

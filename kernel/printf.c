@@ -1,4 +1,5 @@
-#include "junkv/printf.h"
+#include <junkv/types.h>
+#include <junkv/uart.h>
 
 /*
  * ref: https://github.com/cccriscv/mini-riscv-os/blob/master/05-Preemptive/lib.c

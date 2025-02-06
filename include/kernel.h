@@ -1,16 +1,10 @@
 #ifndef __KERNEL_H_
 #define __KERNEL_H_
 
-#include "junkv/types.h"
-#include "junkv/printf.h"
-
-#include "platform.h"
-
-#include "mm/mm.h"
-#include "junkv/sched.h"
+#include <junkv/types.h>
 
 struct context {
-	/* ignore x0 */
+	reg_t zero;
 	reg_t ra;
 	reg_t sp;
 	reg_t gp;

@@ -1,5 +1,5 @@
-#include "junkv/types.h"
-#include "platform.h"
+#include <junkv/types.h>
+#include <platform.h>
 
 /*
  * The UART control registers are memory-mapped at address UART0. 

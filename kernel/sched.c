@@ -1,4 +1,7 @@
-#include "kernel.h"
+#include <junkv/types.h>
+#include <junkv/printf.h>
+#include <riscv/riscv.h>
+#include <kernel.h>
 
 /* defined in entry.S */
 extern void switch_to(struct context *next);
@@ -19,10 +22,10 @@ struct context ctx_tasks[MAX_TASKS];
 static int _top = 0;
 static int _current = -1;
 
-static void w_mscratch(reg_t x)
-{
-	asm volatile("csrw mscratch, %0" : : "r" (x));
-}
+// static void w_mscratch(reg_t x)
+// {
+// 	asm volatile("csrw mscratch, %0" : : "r" (x));
+// }
 
 void sched_init()
 {

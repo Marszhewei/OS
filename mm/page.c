@@ -1,5 +1,6 @@
-#include "kernel.h"
-
+#include <junkv/types.h>
+#include <junkv/printf.h>
+#include <platform.h>
 /*
  * Following global vars are defined in mem.S
  */
