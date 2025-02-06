@@ -15,21 +15,21 @@ CFLAGS = -nostdlib -fno-builtin -march=rv64g -mabi=lp64 -g -Wall -I include -mcm
 LDFLAGS = -T ${BUILD_PATH}/kernel.ld.generated
 
 SRCS_ASM =          \
-	boot/boot.S     \
+	arch/riscv64/boot/boot.S     \
 	mm/mem.S        \
 	kernel/entry.S
 
 SRCS_C =            \
 	kernel/kernel.c \
 	mm/page.c       \
-	kernel/uart.c   \
+	drivers/serial/uart.c   \
 	kernel/printf.c \
 	kernel/sched.c  \
 	kernel/trap.c   \
 	user/main.c
 
-vpath %.c kernel lib mm user
-vpath %.S boot mm kernel
+vpath %.c kernel lib mm user drivers/serial
+vpath %.S boot mm kernel arch/riscv64/boot
 
 OBJS_ASM = $(addprefix ${BUILD_PATH}/, $(notdir $(patsubst %.S, %.o, ${SRCS_ASM})))
 OBJS_C   = $(addprefix ${BUILD_PATH}/, $(notdir $(patsubst %.c, %.o, ${SRCS_C})))

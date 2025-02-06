@@ -4,8 +4,10 @@
 .equ		STACK_SIZE, 1024
 
 .global		_start
+.extern trap_vector    # 声明为外部符号
 
 .text
+.balign 8
 _start:
 	csrr	t0, mhartid			# hart 0
 	mv      tp, t0
@@ -17,8 +19,8 @@ _start:
 	bgeu	a0, a1, bss_clear_done
 bss_clear_loop:
 
-	sw	    zero, (a0)
-	addi	a0, a0, 4
+	sd	    zero, (a0)
+	addi	a0, a0, 8
 	bltu	a0, a1, bss_clear_loop
 bss_clear_done:
 
