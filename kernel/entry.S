@@ -77,59 +77,35 @@
 .text
 
 .globl trap_vector
-.balign 8
+.balign 4
 trap_vector:
-	# save context(registers).
-	csrrw	t6, mscratch, t6	# swap t6 and mscratch
-	reg_save t6
+	csrr	    t0, mscratch
+	reg_save    t0
 
-	# Save the actual t6 register, which we swapped into
-	# mscratch
-	mv	t5, t6			# t5 points to the context of current task
-	csrr	t6, mscratch		# read t6 back from mscratch
-	sd	t6, 30 * 8(t5)	# save t6 with t5 as base
+	csrr	    a0, mepc
+	csrr	    a1, mcause
+	call	    trap_handler
 
-	# Restore the context pointer into mscratch
-	csrw	mscratch, t5
+	csrw	    mepc, a0
 
-	# call the C trap handler in trap.c
-	csrr	a0, mepc
-	csrr	a1, mcause
-	call	trap_handler
+	csrr	    t0, mscratch
+	reg_restore t0
 
-	# trap_handler will return the return address via a0.
-	csrw	mepc, a0
-
-	# restore context(registers).
-	csrr	t6, mscratch
-	reg_restore t6
-
-	# return to whatever we were doing before trap.
 	mret
 
 
 .globl switch_to
-.balign 8
+.balign 4
 switch_to:
-	csrrw	    t6, mscratch, t6	# swap t6 and mscratch
-	beqz	    t6, switch_to_next	# Note: the first time switch_to() is
-	                                # called, mscratch is initialized as zero
-					# (in sched_init()), which makes t6 zero,
-					# and that's the special case we have to
-					# handle with t6
-	reg_save    t6			# save context of prev task
+	csrr	    t0, mscratch
+	beqz	    t0, 1f
 
-	# Save the actual t6 register, which we swapped into
-	# mscratch
-	mv	        t5, t6			# t5 points to the context of current task
-	csrr	    t6, mscratch		# read t6 back from mscratch
-	sd	        t6, 30 * 8(t5)	# save t6 with t5 as base
+	reg_save    t0
 
-switch_to_next:
+1:
 	csrw	    mscratch, a0
 
-	mv	        t6, a0
-	reg_restore t6
+	reg_restore a0
 
 	ret
 

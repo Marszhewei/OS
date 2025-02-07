@@ -10,7 +10,8 @@ void user_task0(void)
 	while (1) {
 		printf("Task 0: Running...\n");
 
-		trap_test();
+		// Just for testing trap
+		// trap_test();
 
 		task_delay(DELAY);
 		task_yield();

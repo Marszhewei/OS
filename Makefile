@@ -20,15 +20,16 @@ SRCS_ASM =          \
 	kernel/entry.S
 
 SRCS_C =            \
-	kernel/kernel.c \
+	init/kernel.c \
 	mm/page.c       \
 	drivers/serial/uart.c   \
 	kernel/printf.c \
 	kernel/sched.c  \
 	kernel/trap.c   \
+	kernel/plic.c \
 	user/main.c
 
-vpath %.c kernel lib mm user drivers/serial
+vpath %.c kernel lib mm user drivers/serial init
 vpath %.S boot mm kernel arch/riscv64/boot
 
 OBJS_ASM = $(addprefix ${BUILD_PATH}/, $(notdir $(patsubst %.S, %.o, ${SRCS_ASM})))
@@ -64,11 +65,16 @@ run: all
 
 .PHONY : debug
 debug: all
-	@echo "Press Ctrl-C and then input 'quit' to exit GDB and QEMU"
+	@${QEMU} -M ? | grep virt >/dev/null || exit
+	@echo "Press Ctrl-A and then X to exit QEMU"
+	@echo "------------------------------------"
+	@${QEMU} ${QFLAGS} -kernel ${ELF} -S
+
+.PHONY : gdb
+gdb: all
+	@echo "Press Ctrl-C and then input 'quit' to exit GDB"
 	@echo "-------------------------------------------------------"
-	@${QEMU} ${QFLAGS} -kernel ${ELF} -S &
 	@${GDB} ${ELF} -q -x gdbinit
-	@killall qemu-system-riscv64 2> /dev/null || true
 
 .PHONY : code
 code: all

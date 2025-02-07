@@ -1,9 +1,8 @@
 #include <junkv/types.h>
 #include <junkv/printf.h>
 #include <platform.h>
-/*
- * Following global vars are defined in mem.S
- */
+
+
 extern ptr_t TEXT_START;
 extern ptr_t TEXT_END;
 extern ptr_t DATA_START;
@@ -22,7 +21,7 @@ extern ptr_t HEAP_SIZE;
  */
 static ptr_t _alloc_start = 0;
 static ptr_t _alloc_end = 0;
-static uint32_t _num_pages = 0;
+static uint64_t _num_pages = 0;
 
 #define PAGE_SIZE 4096
 #define PAGE_ORDER 12
@@ -203,18 +202,3 @@ void page_free(void *p)
 		}
 	}
 }
-
-void page_test()
-{
-	void *p = page_alloc(2);
-	printf("p = %p\n", p);
-	//page_free(p);
-
-	void *p2 = page_alloc(7);
-	printf("p2 = %p\n", p2);
-	page_free(p2);
-
-	void *p3 = page_alloc(4);
-	printf("p3 = %p\n", p3);
-}
-
